@@ -3,11 +3,15 @@
 
 10/31/23: today I added the stat modifier functionality, these are the ones that are added to rolls
 
+11 November 2023 16:00 - Mark Ardrey
+  Commented out the player class to define it in the main program
+    for easier manipulation.
+    (Note: may re-define player in this file instead, to streamline main.)
 */
 
 #ifndef H_creatures
 #define H_creatures
-   
+
 #include <iostream>
 
 class creatureType{
@@ -216,7 +220,7 @@ class creatureType{
         opponent.changeHealth(damage);
     }
 
-class player : public creatureType{
+/*class player : public creatureType{
     public:
         player();
     private: 
@@ -228,7 +232,7 @@ player::player(){
     setLevel(1);
     setDefense(1);
 
-}
+    }*/
 
 
 class wolf : public creatureType{
