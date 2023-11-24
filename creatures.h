@@ -192,7 +192,7 @@ class creatureType{
             int damage = diceRoll(1,4);
             damage = -1*(damage+getStrength());
             cout << "The " << name << " hits " << opponent.name << "dealing " << -damage << " damage." << endl;
-            if(damage > opponent.getHealth()){
+            if(-damage >= opponent.getHealth()){
                 opponent.setHealth(0);
                 cout << "The " << opponent.name << "dies";
             }else{
@@ -209,9 +209,14 @@ class player : public creatureType{
         player();
         player(int strength, int dex, int intell, int wis, int cha, int con);
         void weaponAttack(creatureType& opponent);
+        void fireBolt(creatureType& opponent);
         void heal();
         bool forfeit();
         void levelUp();
+        bool fighter = true;
+        bool mage = false;
+
+        int fireBoltAmount = 1;
 
         int healAmount = 1;
         sword sword;
@@ -250,7 +255,25 @@ void player::weaponAttack(creatureType& opponent){
     if(attackCheck >= opponent.getDefense()){
         int damage = sword.getDamage();
         damage = -1*(damage+getStrength());
-        cout << sword.getDamageText() << opponent.name << "dealing " << -damage << "damage." << endl;
+        cout << sword.getDamageText() << opponent.name << " dealing " << -damage << " damage." << endl;
+        if(-damage >= opponent.getHealth()){
+            opponent.setHealth(0);
+            cout << "The " << opponent.name << "dies";
+        }else{
+            opponent.changeHealth(damage);
+            cout << "The " << opponent.name << " has " << opponent.getHealth() << " health left." << endl;
+        }
+    }else{
+        cout << sword.getMissText();
+    }
+}
+
+void player::fireBolt(creatureType& opponent){
+    int savingRoll = opponent.savingRoll(opponent.getDexterity());
+    if(savingRoll > 11){
+        int damage = diceRoll(fireBoltAmount, 8);
+        damage = -1*(damage);
+        cout << "The fire bolt singes the " << opponent.name << "dealing " << -damage << "damage." << endl;
         if(damage > opponent.getHealth()){
             opponent.setHealth(0);
             cout << "The " << opponent.name << "dies";
@@ -258,11 +281,18 @@ void player::weaponAttack(creatureType& opponent){
             opponent.changeHealth(damage);
             cout << "The " << opponent.name << " has " << opponent.getHealth() << " health left." << endl;
         }
+    }else{
+        cout << "The fire misses." << endl;
     }
 }
 
 void player::levelUp(){
-        sword.setDiceAmount(sword.getDiceAmount()+1);
+        if(fighter == true){
+            sword.setDiceAmount(sword.getDiceAmount()+1);
+        }else if(mage == true){
+            fireBoltAmount ++;
+        }
+        
         //increasing 2 of player stats
 
         setMaxHealth(getMaxHealth()+15);
@@ -442,18 +472,18 @@ class dragon: public creatureType{
 
 void dragon::fireBreath(creatureType& opponent){
     int savingRoll = opponent.savingRoll(opponent.getDexterity());
-    int damage = diceRoll(amountOfFireDice, 6);
+    int damage = diceRoll(7, 6);
     if(savingRoll < 13){
         cout << "The " << opponent.name << " succeeds in dodging, reducing the damage of the breath attack." << endl;
         damage /= 2;
     }
     damage = -1*damage;
     cout << "The " << name << " exhales fire on the " << opponent.name << " dealing " << -damage << " damage." << endl;
-        if(damage > opponent.getHealth()){
+    opponent.changeHealth(damage);
+        if(-damage >= opponent.getHealth()){
             opponent.setHealth(0);
             cout << "The " << opponent.name << " dies";
         }else{
-            opponent.changeHealth(damage);
             cout << "The " << opponent.name << " has " << opponent.getHealth() << " health left." << endl;
         }
 }
@@ -462,9 +492,9 @@ void dragon::bite(creatureType& opponent){
     int attackCheck = diceRoll(1,20);
     attackCheck += getStrength();
     if(attackCheck >= opponent.getDefense()){
-        int damage = diceRoll(amountOfBiteDice, 10);
-        cout << "The " << name << " lunges at the " << opponent.name << " biting them, dealing " << -damage << "damage." << endl;
+        int damage = diceRoll(1, 10);
         damage = -1*(damage+getStrength());
+        cout << "The " << name << " lunges at the " << opponent.name << " biting them, dealing " << -damage << " damage." << endl;
         if(damage > opponent.getHealth()){
             opponent.setHealth(0);
             cout << "The " << opponent.name << "dies";
@@ -481,9 +511,9 @@ void dragon::claw(creatureType& opponent){
     int attackCheck = diceRoll(1,20);
     attackCheck += getStrength();
     if(attackCheck >= opponent.getDefense()){
-        int damage = diceRoll(amountOfClawDice, 6);
-        cout << "The " << name << " claws at the " << opponent.name << " slashing them, dealing " << -damage << "damage." << endl;
+        int damage = diceRoll(1, 6);
         damage = -1*(damage+getStrength());
+        cout << "The " << name << " claws at the " << opponent.name << " slashing them, dealing " << -damage << " damage." << endl;
         if(damage > opponent.getHealth()){
             opponent.setHealth(0);
             cout << "The " << opponent.name << "dies";
@@ -499,14 +529,14 @@ void dragon::claw(creatureType& opponent){
 class redDragonWyrm: public dragon{
     public:
         redDragonWyrm();
-        amountOfFireDice = 7;
-        amountOfClawDice = 1;
-        amountOfBiteDice = 1;
-}
+        int amountOfFireDice = 7;
+        int amountOfClawDice = 1;
+        int amountOfBiteDice = 1;
+};
 
 redDragonWyrm::redDragonWyrm(){
     name = "red dragon wyrmling";
-    setMaxHealth(13);
+    setMaxHealth(75);
     initializeHealth();
     setStrength(4);
     setLevel(1);
