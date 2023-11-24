@@ -79,6 +79,9 @@ class creatureType{
         void setConMod();
 
         int savingRoll(int mod);
+        int initiative();
+
+        string name;
     private:
         int health;
         int level;
@@ -244,8 +247,14 @@ class creatureType{
     }
 
     int creatureType::savingRoll(int mod){
-        int roll = diceRoll(1,4);
+        int roll = diceRoll(1,20);
         roll += mod;
+        return roll;
+    }
+
+    int creatureType::initiative(){
+        int roll = diceRoll(1,20);
+        roll += getDexMod();
         return roll;
     }
 
@@ -256,10 +265,12 @@ class creatureType{
         if(attackCheck >= opponent.getDefense()){
             int damage = diceRoll(1,4);
             damage = -1*(damage+getStrMod());
+            cout << name << "hits " << opponent.name << "dealing " << damage << "damage." << endl;
             if(damage > opponent.getHealth()){
                 opponent.setHealth(0);
             }
             opponent.changeHealth(damage);
+            cout << opponent.name << " has " << opponent.getHealth() << " health left." << endl;
         }
     }
 
@@ -268,8 +279,36 @@ class creatureType{
 class player : public creatureType{
     public:
         player();
+        void heal();
+        bool forfeit();
+
     private: 
 };
+
+void player::heal(){
+    int healAmount = diceRoll(1,8);
+    cout << "The player drinks a health potion, healing " << healAmount << " health" << endl;
+    changeHealth(healAmount);
+}
+
+bool player::forfeit(){
+    char choice;
+    cout << "Would you like to run away. You will have to roll a 4 or above to succeed. Type y or n: ";
+    cin >> choice;
+    if(choice == 'y' || choice == 'Y'){
+        int forfeitRoll = diceRoll(1, 6);
+        cout << "You rolled a " << forfeitRoll << endl;
+        if(forfeitRoll >= 4){
+            cout << "You sucessfully flee." << endl;
+            return true;
+        }else{
+            cout << "You're attempt to run fails." << endl;
+            return false
+        }
+    }else{
+        return false;
+    }
+}
 
 player::player(){
     setMaxHealth(8);
@@ -297,11 +336,15 @@ void wolf::bite(creatureType& opponent){
     attackCheck += getStrMod();
     if(attackCheck >= opponent.getDefense()){
         int damage = diceRoll(2,4);
+        cout << "The wolf lunges at " << opponent.name << "dealing " << damage << "damage" << endl;
         damage = -1*(damage+getStrMod());
         if(damage > opponent.getHealth()){
             opponent.setHealth(0);
         }
         opponent.changeHealth(damage);
+        cout << "The player has " << opponent.getHealth() << " health left." << endl;
+    }else{
+        cout << "The wolves attack miss " << opponent.name << endl;
     }
     
 }
@@ -373,6 +416,11 @@ void zombie::undeadFortitude(){
         setHealth(1);
     }
 }
+
+class skeleton: public skeleton{
+    public:
+    
+};
 
 
 
