@@ -1,12 +1,22 @@
-#ifndef H_diceRoll
-#define H_diceRoll
+/*****************************************************************
+Mark Ardrey and Joshua Rivera
 
-#include <ctime>
+Computer Science II (C++) CSC1061 2H1
+
+CHANGELOG
+
+23 November 2023 8:30 - Mark Ardrey
+  Added diceRoll function.
+ ****************************************************************/
+
 #include <iostream>
+#include <ctime>
+
+using namespace std;
 
 int diceRoll(int diceAmount, int diceType)
 {
-  //sets up the time to be used as the seed
+   //sets up the time to be used as the seed
   srand(std::time(NULL));
 
   int diceTotal = 0, diceRoll = 0;
@@ -15,11 +25,8 @@ int diceRoll(int diceAmount, int diceType)
   for (int i = 0; i < diceAmount; i++)
     {
       //random number generator, and adds the total to the total roll
-      diceRoll = 1 + (std::rand() % diceType) ;
+      diceRoll = 1 + std::rand() / ((RAND_MAX + 1u) / diceType);
       diceTotal += diceRoll;
     }
-
   return diceTotal;
 }
-
-#endif
