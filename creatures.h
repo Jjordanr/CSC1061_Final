@@ -1,22 +1,37 @@
-/*
+//This header file will be used to define the classes of the creatures in the game.
+// It uses an abstract creature class that holds the stats and logic for said class which each creature will then inherent. 
+//Creatures using weapons attacks use composition having a weapon. 
 
+//10/31/23: today I added the stat modifier functionality, these are the ones that are added to rolls
+//11/12/23: today i added dice roll functionality to the attacks and added a max health stat
 
-10/31/23: today I added the stat modifier functionality, these are the ones that are added to rolls
-
-*/
 
 #ifndef H_creatures
 #define H_creatures
-   
-#include <iostream>
 
+#include <iostream>
+#include "diceRoll.h"
+#include "weapons.h"
+
+using namespace std;
+
+//this is the abstract class for each creature
 class creatureType{
     public:
+        //these functions handle health and max health
+        //hp being the value that will be manipulated in combat
+        //and the private maxhp is use to reset that after healing
         int getHealth();
         void setHealth(int hp);
+        void initializeHealth();
 
+        int getMaxHealth();
+        void setMaxHealth(int hp);
+
+        //changes the current health by a certain amount
         void changeHealth(int changeFactor);
 
+        //these functions are simply used to retrive and assing the stats 
         int getStrength();
         void setStrength(int str);
 
@@ -25,6 +40,8 @@ class creatureType{
 
         int getDefense();
         void setDefense(int def);
+
+        //this function generates a random amount of damage and changes another creature object by that amount
 
         void unarmedAttack(creatureType& opponent);
 
@@ -43,6 +60,8 @@ class creatureType{
         int getConstitution();
         void setConstitution(int con);
 
+        //these functions get and set the modifiers of the stats. The modifiers are little weird but these are the stats that
+        //are actually added to the rolls
         int getStrMod();
         int getChaMod();
         int getDexMod();
@@ -58,10 +77,13 @@ class creatureType{
         void setWisMod();
         void setIntMod();
         void setConMod();
+
+        int savingRoll(int mod);
     private:
         int health;
         int level;
         int defense;
+        int maxHealth;
 
         int strength;
         int charisma;
@@ -85,11 +107,22 @@ class creatureType{
         this->health = hp;
     }
 
+    void creatureType::initializeHealth(){
+        this->health = this->maxHealth;
+    }
+
     void creatureType::changeHealth(int changeFactor){
         int tempHealth = getHealth();
         tempHealth += changeFactor;
 
         setHealth(tempHealth);
+    }
+
+    int creatureType::getMaxHealth(){
+        return this->maxHealth;
+    }
+    void creatureType::setMaxHealth(int hp){
+        this->maxHealth = hp;
     }
 
     int creatureType::getStrength(){
@@ -210,12 +243,28 @@ class creatureType{
         return mod;
     }
 
-
-    void creatureType::unarmedAttack(creatureType& opponent){
-        int damage = -1 - getStrMod();
-        opponent.changeHealth(damage);
+    int creatureType::savingRoll(int mod){
+        int roll = diceRoll(1,4);
+        roll += mod;
+        return roll;
     }
 
+
+    void creatureType::unarmedAttack(creatureType& opponent){
+        int attackCheck = diceRoll(1,20);
+        attackCheck += getStrMod();
+        if(attackCheck >= opponent.getDefense()){
+            int damage = diceRoll(1,4);
+            damage = -1*(damage+getStrMod());
+            if(damage > opponent.getHealth()){
+                opponent.setHealth(0);
+            }
+            opponent.changeHealth(damage);
+        }
+    }
+
+//a beta player class used currently just for testing, the actual player would be in the main cpp file
+//since it can be more easily manipulated
 class player : public creatureType{
     public:
         player();
@@ -223,24 +272,108 @@ class player : public creatureType{
 };
 
 player::player(){
-    setHealth(5);
-    setStrength(2);
+    setMaxHealth(8);
+    initializeHealth();
+    setStrength(12);
     setLevel(1);
     setDefense(1);
-
+    setStrMod();
+    setChaMod();
+    setDexMod();
+    setWisMod();
+    setIntMod();
+    setConMod();
 }
 
-
+//a wolf enemy class
 class wolf : public creatureType{
     public:
         wolf();
+        void bite(creatureType& opponent);
 }; 
 
-wolf::wolf(){
-    setHealth(4);
-    setStrength(4);
-    setLevel(1);
-    setDefense(1);
+void wolf::bite(creatureType& opponent){
+    int attackCheck = diceRoll(1,20);
+    attackCheck += getStrMod();
+    if(attackCheck >= opponent.getDefense()){
+        int damage = diceRoll(2,4);
+        damage = -1*(damage+getStrMod());
+        if(damage > opponent.getHealth()){
+            opponent.setHealth(0);
+        }
+        opponent.changeHealth(damage);
+    }
+    
 }
+
+wolf::wolf(){
+    setMaxHealth(11);
+    initializeHealth();
+    setStrength(12);
+    setLevel(1);
+    setDefense(13);
+    setCharisma(5);
+    setDexterity(6);
+    setWisdom(6);
+    setIntelligence(3);
+    setConstitution(13);
+
+    setStrMod();
+    setChaMod();
+    setDexMod();
+    setWisMod();
+    setIntMod();
+    setConMod();
+}
+
+class zombie: public creatureType{
+    public:
+        zombie();
+        void slam(creatureType& opponent);
+        void undeadFortitude();
+};
+
+zombie::zombie(){
+    setMaxHealth(22);
+    initializeHealth();
+    setStrength(13);
+    setLevel(1);
+    setDefense(8);
+    setCharisma(5);
+    setDexterity(6);
+    setWisdom(6);
+    setIntelligence(3);
+    setConstitution(16);
+
+    setStrMod();
+    setChaMod();
+    setDexMod();
+    setWisMod();
+    setIntMod();
+    setConMod();
+}
+
+void zombie::slam(creatureType& opponent){
+    int attackCheck = diceRoll(1,20);
+    attackCheck += getStrMod();
+    if(attackCheck >= opponent.getDefense()){
+        int damage = diceRoll(1,6);
+        damage = -1*(damage+getStrMod());
+        if(damage > opponent.getHealth()){
+            opponent.setHealth(0);
+        }
+        opponent.changeHealth(damage);
+    }
+}
+
+void zombie::undeadFortitude(){
+    int reviveCheck = diceRoll(1,20);
+    reviveCheck += savingRoll(getConMod());
+    if(reviveCheck > 10){
+        setHealth(1);
+    }
+}
+
+
 
 #endif
