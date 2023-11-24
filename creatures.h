@@ -60,24 +60,6 @@ class creatureType{
         int getConstitution();
         void setConstitution(int con);
 
-        //these functions get and set the modifiers of the stats. The modifiers are little weird but these are the stats that
-        //are actually added to the rolls
-        int getStrMod();
-        int getChaMod();
-        int getDexMod();
-        int getWisMod();
-        int getIntMod();
-        int getConMod();
-
-        int modCalc(int baseStat);
-
-        void setStrMod();
-        void setChaMod();
-        void setDexMod();
-        void setWisMod();
-        void setIntMod();
-        void setConMod();
-
         int savingRoll(int mod);
         int initiative();
 
@@ -95,12 +77,6 @@ class creatureType{
         int intelligence;
         int constitution;
 
-        int strMod;
-        int chaMod;
-        int dexMod;
-        int widMod;
-        int intMod;
-        int conMod;
 };
     int creatureType::getHealth(){
         return this->health;
@@ -117,8 +93,12 @@ class creatureType{
     void creatureType::changeHealth(int changeFactor){
         int tempHealth = getHealth();
         tempHealth += changeFactor;
-
-        setHealth(tempHealth);
+        if(tempHealth > getMaxHealth()){
+            initializeHealth();
+        }else{
+            setHealth(tempHealth);
+        }
+        
     }
 
     int creatureType::getMaxHealth(){
@@ -192,60 +172,6 @@ class creatureType{
         this->constitution = con;
     }
 
-    int creatureType::getStrMod(){
-        return this->strMod;
-    }
-    int creatureType::getChaMod(){
-        return this->chaMod;
-    }
-    int creatureType::getDexMod(){
-        return this->dexMod;
-    }
-    int creatureType::getWisMod(){
-        return this->widMod;
-    }
-    int creatureType::getIntMod(){
-        return this->intMod;
-    }
-    int creatureType::getConMod(){
-        return this->conMod;
-    }
-
-
-
-    void creatureType::setStrMod(){
-        int mod = modCalc(getStrength());
-        this->strMod = mod;
-    }
-    void creatureType::setChaMod(){
-        int mod = modCalc(getCharisma());
-        this->chaMod = mod;
-    }
-    void creatureType::setDexMod(){
-        int mod = modCalc(getDexterity());
-        this->dexMod = mod;
-    }
-    void creatureType::setWisMod(){
-        int mod = modCalc(getWisdom());
-        this->widMod = mod;
-    }
-    void creatureType::setIntMod(){
-        int mod = modCalc(getIntelligene());
-        this->intMod = mod;
-    }
-    void creatureType::setConMod(){
-        int mod = modCalc(getConstitution());
-        this->conMod = mod;
-    }
-
-
-    int creatureType::modCalc(int baseStat){
-        int mod = baseStat;
-        mod -= 10;
-        mod /= 2;
-        return mod;
-    }
-
     int creatureType::savingRoll(int mod){
         int roll = diceRoll(1,20);
         roll += mod;
@@ -254,23 +180,25 @@ class creatureType{
 
     int creatureType::initiative(){
         int roll = diceRoll(1,20);
-        roll += getDexMod();
+        roll += getDexterity();
         return roll;
     }
 
 
     void creatureType::unarmedAttack(creatureType& opponent){
         int attackCheck = diceRoll(1,20);
-        attackCheck += getStrMod();
+        attackCheck += getStrength();
         if(attackCheck >= opponent.getDefense()){
             int damage = diceRoll(1,4);
-            damage = -1*(damage+getStrMod());
-            cout << name << "hits " << opponent.name << "dealing " << damage << "damage." << endl;
+            damage = -1*(damage+getStrength());
+            cout << "The " << name << " hits " << opponent.name << "dealing " << -damage << " damage." << endl;
             if(damage > opponent.getHealth()){
                 opponent.setHealth(0);
+                cout << "The " << opponent.name << "dies";
+            }else{
+                opponent.changeHealth(damage);
+                cout << "The " << opponent.name << " has " << opponent.getHealth() << " health left." << endl;
             }
-            opponent.changeHealth(damage);
-            cout << opponent.name << " has " << opponent.getHealth() << " health left." << endl;
         }
     }
 
@@ -279,14 +207,20 @@ class creatureType{
 class player : public creatureType{
     public:
         player();
+        player(int strength, int dex, int intell, int wis, int cha, int con);
+        void weaponAttack(creatureType& opponent);
         void heal();
         bool forfeit();
+        void levelUp();
+
+        int healAmount = 1;
+        sword sword;
 
     private: 
 };
 
 void player::heal(){
-    int healAmount = diceRoll(1,8);
+    int healAmount = diceRoll(healAmount,10);
     cout << "The player drinks a health potion, healing " << healAmount << " health" << endl;
     changeHealth(healAmount);
 }
@@ -303,25 +237,65 @@ bool player::forfeit(){
             return true;
         }else{
             cout << "You're attempt to run fails." << endl;
-            return false
+            return false;
         }
     }else{
         return false;
     }
 }
 
+void player::weaponAttack(creatureType& opponent){
+    int attackCheck = diceRoll(1,20);
+    attackCheck += getStrength();
+    if(attackCheck >= opponent.getDefense()){
+        int damage = sword.getDamage();
+        damage = -1*(damage+getStrength());
+        cout << sword.getDamageText() << opponent.name << "dealing " << -damage << "damage." << endl;
+        if(damage > opponent.getHealth()){
+            opponent.setHealth(0);
+            cout << "The " << opponent.name << "dies";
+        }else{
+            opponent.changeHealth(damage);
+            cout << "The " << opponent.name << " has " << opponent.getHealth() << " health left." << endl;
+        }
+    }
+}
+
+void player::levelUp(){
+        sword.setDiceAmount(sword.getDiceAmount()+1);
+        //increasing 2 of player stats
+
+        setMaxHealth(getMaxHealth()+15);
+        initializeHealth();
+
+        healAmount ++;
+}
+
 player::player(){
-    setMaxHealth(8);
+    name = "player";
+    setMaxHealth(12);
     initializeHealth();
-    setStrength(12);
+    setStrength(2);
     setLevel(1);
     setDefense(1);
-    setStrMod();
-    setChaMod();
-    setDexMod();
-    setWisMod();
-    setIntMod();
-    setConMod();
+    setDexterity(1);
+    setWisdom(1);
+    setCharisma(1);
+    setConstitution(1);
+    setIntelligence(1);
+}
+
+player::player(int strength, int dex, int intell, int wis, int cha, int con){
+    setMaxHealth(12);
+    initializeHealth();
+    setStrength(strength);
+    setLevel(1);
+    setDefense(1);
+    setDexterity(dex);
+    setWisdom(wis);
+    setCharisma(cha);
+    setConstitution(con);
+    setIntelligence(intell);
 }
 
 //a wolf enemy class
@@ -333,40 +307,36 @@ class wolf : public creatureType{
 
 void wolf::bite(creatureType& opponent){
     int attackCheck = diceRoll(1,20);
-    attackCheck += getStrMod();
+    attackCheck += getStrength();
     if(attackCheck >= opponent.getDefense()){
         int damage = diceRoll(2,4);
-        cout << "The wolf lunges at " << opponent.name << "dealing " << damage << "damage" << endl;
-        damage = -1*(damage+getStrMod());
+        cout << "The wolf lunges at the " << opponent.name << "biting them, dealing " << -damage << "damage." << endl;
+        damage = -1*(damage+getStrength());
         if(damage > opponent.getHealth()){
             opponent.setHealth(0);
+            cout << "The " << opponent.name << "dies";
+        }else{
+            opponent.changeHealth(damage);
+            cout << "The " << opponent.name << " has " << opponent.getHealth() << " health left." << endl;
         }
-        opponent.changeHealth(damage);
-        cout << "The player has " << opponent.getHealth() << " health left." << endl;
     }else{
-        cout << "The wolves attack miss " << opponent.name << endl;
+        cout << "The wolf's attack miss the " << opponent.name << "."<<endl;
     }
     
 }
 
 wolf::wolf(){
+    name = "wolf";
     setMaxHealth(11);
     initializeHealth();
-    setStrength(12);
+    setStrength(1);
     setLevel(1);
-    setDefense(13);
-    setCharisma(5);
-    setDexterity(6);
-    setWisdom(6);
-    setIntelligence(3);
-    setConstitution(13);
-
-    setStrMod();
-    setChaMod();
-    setDexMod();
-    setWisMod();
-    setIntMod();
-    setConMod();
+    setDefense(1);
+    setCharisma(-3);
+    setDexterity(-2);
+    setWisdom(-2);
+    setIntelligence(-4);
+    setConstitution(1);
 }
 
 class zombie: public creatureType{
@@ -377,51 +347,175 @@ class zombie: public creatureType{
 };
 
 zombie::zombie(){
+    name = "zombie";
     setMaxHealth(22);
     initializeHealth();
-    setStrength(13);
+    setStrength(1);
     setLevel(1);
     setDefense(8);
-    setCharisma(5);
-    setDexterity(6);
-    setWisdom(6);
-    setIntelligence(3);
-    setConstitution(16);
+    setCharisma(-3);
+    setDexterity(-2);
+    setWisdom(-2);
+    setIntelligence(-4);
+    setConstitution(3);
 
-    setStrMod();
-    setChaMod();
-    setDexMod();
-    setWisMod();
-    setIntMod();
-    setConMod();
 }
 
 void zombie::slam(creatureType& opponent){
     int attackCheck = diceRoll(1,20);
-    attackCheck += getStrMod();
+    attackCheck += getStrength();
     if(attackCheck >= opponent.getDefense()){
         int damage = diceRoll(1,6);
-        damage = -1*(damage+getStrMod());
+        damage = -1*(damage+getStrength());
+         cout << "The zombie bites the " << opponent.name << "dealing " << -damage << "damage." << endl;
         if(damage > opponent.getHealth()){
             opponent.setHealth(0);
+            cout << "The " << opponent.name << "dies";
+        }else{
+            opponent.changeHealth(damage);
+            cout << "The " << opponent.name << " has " << opponent.getHealth() << " health left." << endl;
         }
-        opponent.changeHealth(damage);
+    }else{
+        cout << "The zombie misses." << endl;
     }
 }
 
 void zombie::undeadFortitude(){
     int reviveCheck = diceRoll(1,20);
-    reviveCheck += savingRoll(getConMod());
+    reviveCheck += savingRoll(getConstitution());
     if(reviveCheck > 10){
+        cout << "The zombie revives, regaining 1 hit point." << endl;
         setHealth(1);
     }
 }
 
-class skeleton: public skeleton{
+class skeleton: public creatureType{
     public:
-    
+    skeleton();
+    void weaponAttack(creatureType& opponent);
+    sword sword;
+
 };
 
+void skeleton::weaponAttack(creatureType& opponent){
+    int attackCheck = diceRoll(1,20);
+    attackCheck += getStrength();
+    if(attackCheck >= opponent.getDefense()){
+        int damage = sword.getDamage();
+        damage = -1*(damage+getStrength());
+        cout << sword.getDamageText() << opponent.name << " dealing " << -damage << " damage." << endl;
+        if(damage > opponent.getHealth()){
+            opponent.setHealth(0);
+            cout << "The " << opponent.name << " dies";
+        }else{
+            opponent.changeHealth(damage);
+            cout << "The " << opponent.name << " has " << opponent.getHealth() << " health left." << endl;
+        }
+    }else{
+        cout << sword.getMissText();
+    }
+}
 
+skeleton::skeleton(){
+    name = "skeleton";
+    setMaxHealth(13);
+    initializeHealth();
+    setStrength(0);
+    setLevel(1);
+    setDefense(13);
+    setCharisma(-3);
+    setDexterity(2);
+    setWisdom(-1);
+    setIntelligence(-2);
+    setConstitution(2);
+}
+
+class dragon: public creatureType{
+    public:
+        int amountOfFireDice;
+        int amountOfBiteDice;
+        int amountOfClawDice;
+        void fireBreath(creatureType& opponent);
+        void bite(creatureType& opponent);
+        void claw(creatureType& opponent);
+};
+
+void dragon::fireBreath(creatureType& opponent){
+    int savingRoll = opponent.savingRoll(opponent.getDexterity());
+    int damage = diceRoll(amountOfFireDice, 6);
+    if(savingRoll < 13){
+        cout << "The " << opponent.name << " succeeds in dodging, reducing the damage of the breath attack." << endl;
+        damage /= 2;
+    }
+    damage = -1*damage;
+    cout << "The " << name << " exhales fire on the " << opponent.name << " dealing " << -damage << " damage." << endl;
+        if(damage > opponent.getHealth()){
+            opponent.setHealth(0);
+            cout << "The " << opponent.name << " dies";
+        }else{
+            opponent.changeHealth(damage);
+            cout << "The " << opponent.name << " has " << opponent.getHealth() << " health left." << endl;
+        }
+}
+
+void dragon::bite(creatureType& opponent){
+    int attackCheck = diceRoll(1,20);
+    attackCheck += getStrength();
+    if(attackCheck >= opponent.getDefense()){
+        int damage = diceRoll(amountOfBiteDice, 10);
+        cout << "The " << name << " lunges at the " << opponent.name << " biting them, dealing " << -damage << "damage." << endl;
+        damage = -1*(damage+getStrength());
+        if(damage > opponent.getHealth()){
+            opponent.setHealth(0);
+            cout << "The " << opponent.name << "dies";
+        }else{
+            opponent.changeHealth(damage);
+            cout << "The " << opponent.name << " has " << opponent.getHealth() << " health left." << endl;
+        }
+    }else{
+        cout << "The " << name << " bites the air."<<endl;
+    }
+}
+
+void dragon::claw(creatureType& opponent){
+    int attackCheck = diceRoll(1,20);
+    attackCheck += getStrength();
+    if(attackCheck >= opponent.getDefense()){
+        int damage = diceRoll(amountOfClawDice, 6);
+        cout << "The " << name << " claws at the " << opponent.name << " slashing them, dealing " << -damage << "damage." << endl;
+        damage = -1*(damage+getStrength());
+        if(damage > opponent.getHealth()){
+            opponent.setHealth(0);
+            cout << "The " << opponent.name << "dies";
+        }else{
+            opponent.changeHealth(damage);
+            cout << "The " << opponent.name << " has " << opponent.getHealth() << " health left." << endl;
+        }
+    }else{
+        cout << "The " << name << " fails their attack."<<endl;
+    }
+}
+
+class redDragonWyrm: public dragon{
+    public:
+        redDragonWyrm();
+        amountOfFireDice = 7;
+        amountOfClawDice = 1;
+        amountOfBiteDice = 1;
+}
+
+redDragonWyrm::redDragonWyrm(){
+    name = "red dragon wyrmling";
+    setMaxHealth(13);
+    initializeHealth();
+    setStrength(4);
+    setLevel(1);
+    setDefense(13);
+    setCharisma(2);
+    setDexterity(0);
+    setWisdom(0);
+    setIntelligence(1);
+    setConstitution(3);
+}
 
 #endif

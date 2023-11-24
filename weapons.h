@@ -85,7 +85,7 @@ club::club(){
     setDiceAmount(1);
     setName("club");
     setDamageText("The club bashes into the side of ");
-    setMissText("The club whiffs, missing its target.");
+    setMissText("The club whiffs, missing its target.\n");
 }
 
 class dagger: public weaponBase{
@@ -98,7 +98,7 @@ dagger::dagger(){
     setDiceAmount(1);
     setName("dagger");
     setDamageText("The dagger jabs into ");
-    setMissText("The dagger cuts through the air, missing.");
+    setMissText("The dagger cuts through the air, missing.\n");
 }
 
 class greatclub: public weaponBase{
@@ -111,7 +111,7 @@ greatclub::greatclub(){
     setDiceAmount(1);
     setName("greatclub");
     setDamageText("The greatclub bashes into the side of ");
-    setMissText("The greatclub whiffs, missing its target.");
+    setMissText("The greatclub whiffs, missing its target.\n");
 }
 
 class handaxe: public weaponBase{
@@ -124,7 +124,7 @@ handaxe::handaxe(){
     setDiceAmount(1);
     setName("handaxe");
     setDamageText("The axe slashes ");
-    setMissText("The axe clashes with the air, missing its target.");
+    setMissText("The axe clashes with the air, missing its target.\n");
 }
 
 class javelin: public weaponBase{
@@ -137,7 +137,7 @@ javelin::javelin(){
     setDiceAmount(1);
     setName("javelin");
     setDamageText("The javelin pierces into ");
-    setMissText("The javelin pierces the air, missing its target.");
+    setMissText("The javelin pierces the air, missing its target.\n");
 }
 
 class lightHammer: public weaponBase{
@@ -150,7 +150,7 @@ lightHammer::lightHammer(){
     setDiceAmount(1);
     setName("light hammer");
     setDamageText("The light hammer bashes into ");
-    setMissText("The light hammer whiffs, missing its target.");
+    setMissText("The light hammer whiffs, missing its target.\n");
 }
 
 class mace: public weaponBase{
@@ -163,7 +163,20 @@ mace::mace(){
     setDiceAmount(1);
     setName("mace");
     setDamageText("The mace bashes into the side of ");
-    setMissText("The mace whiffs, missing its target.");
+    setMissText("The mace whiffs, missing its target.\n");
+}
+
+class sword: public weaponBase{
+    public:
+    sword();
+};
+
+sword::sword(){
+    setDiceType(6);
+    setDiceAmount(1);
+    setName("sword");
+    setDamageText("The sword slashes the ");
+    setMissText("The sword misses, dealing no damage.\n");
 }
 
 
