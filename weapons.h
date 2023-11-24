@@ -179,6 +179,17 @@ sword::sword(){
     setMissText("The sword misses, dealing no damage.\n");
 }
 
+class scimitar: public weaponBase{
+    public:
+    scimitar();
+};
 
+scimitar::scimitar(){
+    setDiceType(6);
+    setDiceAmount(1);
+    setName("scimitar");
+    setDamageText("The scimitar slashes the ");
+    setMissText("The scimitar misses, dealing no damage.\n");
+}
 
 #endif

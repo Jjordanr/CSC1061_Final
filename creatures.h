@@ -63,6 +63,8 @@ class creatureType{
         int savingRoll(int mod);
         int initiative();
 
+        void weaponAttack(creatureType& opponent, weaponBase& weaponBase);
+
         string name;
     private:
         int health;
@@ -202,13 +204,32 @@ class creatureType{
         }
     }
 
+    void creatureType::weaponAttack(creatureType& opponent, weaponBase& weaponBase){
+    int attackCheck = diceRoll(1,20);
+    attackCheck += getStrength();
+    if(attackCheck >= opponent.getDefense()){
+        int damage = weaponBase.getDamage();
+        damage = -1*(damage+getStrength());
+        cout << weaponBase.getDamageText() << opponent.name << " dealing " << -damage << " damage." << endl;
+        if(-damage >= opponent.getHealth()){
+            opponent.setHealth(0);
+            cout << "The " << opponent.name << "dies";
+        }else{
+            opponent.changeHealth(damage);
+            cout << "The " << opponent.name << " has " << opponent.getHealth() << " health left." << endl;
+        }
+    }else{
+        cout << weaponBase.getMissText();
+    }
+}
+
 //a beta player class used currently just for testing, the actual player would be in the main cpp file
 //since it can be more easily manipulated
 class player : public creatureType{
     public:
         player();
         player(int strength, int dex, int intell, int wis, int cha, int con);
-        void weaponAttack(creatureType& opponent);
+        //void weaponAttack(creatureType& opponent);
         void fireBolt(creatureType& opponent);
         void heal();
         bool forfeit();
@@ -249,7 +270,7 @@ bool player::forfeit(){
     }
 }
 
-void player::weaponAttack(creatureType& opponent){
+/*void player::weaponAttack(creatureType& opponent){
     int attackCheck = diceRoll(1,20);
     attackCheck += getStrength();
     if(attackCheck >= opponent.getDefense()){
@@ -266,7 +287,7 @@ void player::weaponAttack(creatureType& opponent){
     }else{
         cout << sword.getMissText();
     }
-}
+}*/
 
 void player::fireBolt(creatureType& opponent){
     int savingRoll = opponent.savingRoll(opponent.getDexterity());
@@ -427,7 +448,7 @@ class skeleton: public creatureType{
 
 };
 
-void skeleton::weaponAttack(creatureType& opponent){
+/*void skeleton::weaponAttack(creatureType& opponent){
     int attackCheck = diceRoll(1,20);
     attackCheck += getStrength();
     if(attackCheck >= opponent.getDefense()){
@@ -444,7 +465,7 @@ void skeleton::weaponAttack(creatureType& opponent){
     }else{
         cout << sword.getMissText();
     }
-}
+}*/
 
 skeleton::skeleton(){
     name = "skeleton";
@@ -547,5 +568,56 @@ redDragonWyrm::redDragonWyrm(){
     setIntelligence(1);
     setConstitution(3);
 }
+
+class goblin: public creatureType{
+    public:
+    goblin();
+    scimitar scimitar;
+};
+
+goblin::goblin(){
+    name = "goblin";
+    setMaxHealth(7);
+    initializeHealth();
+    setStrength(-1);
+    setLevel(1);
+    setDefense(15);
+    setCharisma(-1);
+    setDexterity(2);
+    setWisdom(-1);
+    setIntelligence(0);
+    setConstitution(0);
+}
+
+class goblinBoss: public goblin{
+    public:
+    goblinBoss();
+    void multiattack();
+};
+
+goblinBoss::goblinBoss(){
+    name = "goblin";
+    setMaxHealth(21);
+    initializeHealth();
+    setStrength(0);
+    setLevel(1);
+    setDefense(17);
+    setCharisma(-1);
+    setDexterity(2);
+    setWisdom(-1);
+    setIntelligence(0);
+    setConstitution(0);
+}
+
+void goblinBoss::multiattack(creatureType& opponent, weaponBase& weaponBase){
+    weaponAttack(opponent, scimitar);
+    int roll = diceRoll(1,20);
+    if(roll>= opponent.getDefense()){
+        weaponAttack(opponent, scimitar);
+    }else{
+        cout << weaponBase.getMissText;
+    }
+}
+
 
 #endif
