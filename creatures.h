@@ -1,24 +1,69 @@
-//This header file will be used to define the classes of the creatures in the game.
-// It uses an abstract creature class that holds the stats and logic for said class which each creature will then inherent. 
-//Creatures using weapons attacks use composition having a weapon. 
+/*
+Mark Ardrey and Joshua Rivera
 
-//10/31/23: today I added the stat modifier functionality, these are the ones that are added to rolls
-//11/12/23: today i added dice roll functionality to the attacks and added a max health stat
+Computer Science II (C++) CSC1061 2H1
 
+CHANGELOG
+
+10/31/23: today I added the stat modifier functionality, these are the ones that are added to rolls
+
+11 November 2023 16:00 - Mark Ardrey
+  Commented out the player class to define it in the main program
+    for easier manipulation.
+    (Note: may re-define player in this file instead, to streamline main.)
+
+15 November 2023 14:00 - Mark Ardrey
+  Uncommented out the player class, and added functions updateStats
+    and characterCreation.
+  Modified updateStats to function as intended.
+
+16 November 2023 23:00 - Mark Ardrey
+  Almost completed characterCreation except for the randomly generated character.
+  Might delete randomly generating a character and instead force the player
+    to make their own.
+
+17 November 2023 22:20 - Mark Ardrey
+  Defined the player constructor.
+
+21 November 2023 18:30 - Mark Ardrey
+  Redefined the player constructor.
+    - Removed the playerEdit object in player constructor.
+  The updateStats function now works as intended.
+  The characterCreation function now works as intended.
+  Commented out the stats modifiers.
+    - These should be useless, as we could probably simplify the process
+      by just using the base stats as the modifier value.
+  Begun working on the main file.
+
+23 November 2023 10:00 - Mark Ardrey
+  Edited the characterCreation and updateStats functions to make it more
+    user friendly.
+
+23 November 2023 20:00 - Mark Ardrey
+  Removed inventory.
+  Added integer variable gold to creatureType.
+    - If the player defeats a monster, they recieve their gold amount.
+  Added string variable weapon to player.
+    - It should just be used to determine what their weapon is in text.
+
+25 November 2023 1:00 - Mark Ardrey
+  Integrated stuff done by Joshua into the file.
+*/
 
 #ifndef H_creatures
 #define H_creatures
 
 #include <iostream>
+#include <string>
+#include <iomanip>
 #include "diceRoll.h"
 #include "weapons.h"
 
 using namespace std;
 
-//this is the abstract class for each creature
 class creatureType{
     public:
-        //these functions handle health and max health
+  //these functions handle health and max health
         //hp being the value that will be manipulated in combat
         //and the private maxhp is use to reset that after healing
         int getHealth();
@@ -31,7 +76,6 @@ class creatureType{
         //changes the current health by a certain amount
         void changeHealth(int changeFactor);
 
-        //these functions are simply used to retrive and assing the stats 
         int getStrength();
         void setStrength(int str);
 
@@ -40,8 +84,6 @@ class creatureType{
 
         int getDefense();
         void setDefense(int def);
-
-        //this function generates a random amount of damage and changes another creature object by that amount
 
         void unarmedAttack(creatureType& opponent);
 
@@ -54,7 +96,7 @@ class creatureType{
         int getWisdom();
         void setWisdom(int wis);
 
-        int getIntelligene();
+        int getIntelligence();
         void setIntelligence(int intell);
 
         int getConstitution();
@@ -66,6 +108,26 @@ class creatureType{
         void weaponAttack(creatureType& opponent, weaponBase& weaponBase);
 
         string name;
+
+        int gold; //gold is used
+
+  /*
+        int getStrMod();
+        int getChaMod();
+        int getDexMod();
+        int getWisMod();
+        int getIntMod();
+        int getConMod();
+
+        int modCalc(int baseStat);
+
+        void setStrMod();
+        void setChaMod();
+        void setDexMod();
+        void setWisMod();
+        void setIntMod();
+        void setConMod();
+  */
     private:
         int health;
         int level;
@@ -73,12 +135,18 @@ class creatureType{
         int maxHealth;
 
         int strength;
-        int charisma;
-        int dexterity;
-        int wisdom;
+        int charisma; //maybe get rid of charisma
+        int dexterity; //maybe get rid of dexterity
+        int wisdom; //maybe get rid of wisdom
         int intelligence;
         int constitution;
 
+        int strMod;
+        int chaMod;
+        int dexMod;
+        int widMod;
+        int intMod;
+        int conMod;
 };
     int creatureType::getHealth(){
         return this->health;
@@ -100,12 +168,13 @@ class creatureType{
         }else{
             setHealth(tempHealth);
         }
-        
+
     }
 
     int creatureType::getMaxHealth(){
         return this->maxHealth;
     }
+
     void creatureType::setMaxHealth(int hp){
         this->maxHealth = hp;
     }
@@ -127,7 +196,7 @@ class creatureType{
     }
 
     int creatureType::getDefense(){
-        return this->health;
+        return this->defense;
     }
 
     void creatureType::setDefense(int def){
@@ -158,7 +227,7 @@ class creatureType{
         this->wisdom = wis;
     }
 
-    int creatureType::getIntelligene(){
+    int creatureType::getIntelligence(){
         return this->intelligence;
     }
 
@@ -223,27 +292,47 @@ class creatureType{
     }
 }
 
-//a beta player class used currently just for testing, the actual player would be in the main cpp file
-//since it can be more easily manipulated
-class player : public creatureType{
-    public:
-        player();
-        player(int strength, int dex, int intell, int wis, int cha, int con);
-        //void weaponAttack(creatureType& opponent);
-        void fireBolt(creatureType& opponent);
-        void heal();
-        bool forfeit();
-        void levelUp();
-        bool fighter = true;
-        bool mage = false;
+class player : public creatureType
+{
+public:
+  //constructor
+  player();
+  void editInventory();
+  int updateStats();
+  void characterCreation();
+  void fireBolt(creatureType& opponent);
+  void heal();
+  bool forfeit();
+  void levelUp();
 
-        int fireBoltAmount = 1;
+  int fireBoltAmount = 1;
+  int healAmount = 1;
+  sword swordWeapon;
 
-        int healAmount = 1;
-        sword sword;
-
-    private: 
+  int statPointsTotal = 2; //the player starts with one stat point.
+  int healthPotions = 1;
+  string weapon;
+  int specialty; //1 for mage, 2 for fighter
+  string spell; //used if player has selected mage
 };
+
+//BEGINNING OF PLAYER FUNCTIONS
+
+//constructor definition
+player::player(){
+  creatureType playerModify;
+
+  //sets each base stat that the player might use
+  setHealth(5);
+  setStrength(1);
+  setDexterity(1);
+  setConstitution(1);
+  setWisdom(1);
+  setIntelligence(1);
+  setCharisma(1);
+  setLevel(1);
+  setDefense(1);
+}
 
 void player::heal(){
     int healAmount = diceRoll(healAmount,10);
@@ -270,25 +359,6 @@ bool player::forfeit(){
     }
 }
 
-/*void player::weaponAttack(creatureType& opponent){
-    int attackCheck = diceRoll(1,20);
-    attackCheck += getStrength();
-    if(attackCheck >= opponent.getDefense()){
-        int damage = sword.getDamage();
-        damage = -1*(damage+getStrength());
-        cout << sword.getDamageText() << opponent.name << " dealing " << -damage << " damage." << endl;
-        if(-damage >= opponent.getHealth()){
-            opponent.setHealth(0);
-            cout << "The " << opponent.name << "dies";
-        }else{
-            opponent.changeHealth(damage);
-            cout << "The " << opponent.name << " has " << opponent.getHealth() << " health left." << endl;
-        }
-    }else{
-        cout << sword.getMissText();
-    }
-}*/
-
 void player::fireBolt(creatureType& opponent){
     int savingRoll = opponent.savingRoll(opponent.getDexterity());
     if(savingRoll > 11){
@@ -308,12 +378,12 @@ void player::fireBolt(creatureType& opponent){
 }
 
 void player::levelUp(){
-        if(fighter == true){
-            sword.setDiceAmount(sword.getDiceAmount()+1);
-        }else if(mage == true){
+        if(specialty == 1){
+            swordWeapon.setDiceAmount(swordWeapon.getDiceAmount()+1);
+        }else if(specialty == 2){
             fireBoltAmount ++;
         }
-        
+
         //increasing 2 of player stats
 
         setMaxHealth(getMaxHealth()+15);
@@ -322,32 +392,198 @@ void player::levelUp(){
         healAmount ++;
 }
 
-player::player(){
-    name = "player";
-    setMaxHealth(12);
-    initializeHealth();
-    setStrength(2);
-    setLevel(1);
-    setDefense(1);
-    setDexterity(1);
-    setWisdom(1);
-    setCharisma(1);
-    setConstitution(1);
-    setIntelligence(1);
+//finished
+void updateStats()
+{
+  creatureType creatureModify; //player modify is used to edit the member variables of creatureType
+  player playerEdit;
+  bool correctAnswer = false;
+  int answer;
+
+  while (!correctAnswer)
+    {
+      cout << "1 to view current stats.\n2 to update stats.\n3 to exit.\nYou have ";
+      if (playerEdit.statPointsTotal == 1)
+        cout << playerEdit.statPointsTotal << " stat point left.\n";
+      else
+        cout << playerEdit.statPointsTotal << " stat points left.\n";
+      cout << "Enter answer: ";
+      cin >> answer;
+
+      if (answer == 1)
+        {
+          cout << "\nStrength - " << playerEdit.getStrength()
+               << "\n    Used for increasing melee attack damage."
+               << "\nDexterity - " << playerEdit.getDexterity()
+               << "\n    Used for dodging attacks."
+               << "\nConstitution - " << playerEdit.getConstitution()
+               << "\n    Used for increasing health and defense."
+               << "\nIntelligence - " << playerEdit.getIntelligence()
+               << "\n    Used for increasing spell attack damage."
+               << "\nWisdom - " << playerEdit.getWisdom()
+               << "\n    Used for increasing spell hit chance."
+               << "\nCharisma - " << playerEdit.getCharisma()
+               << "\n    Used for better prices, and better quests."
+               << "\n\n";
+        }
+      else if (answer == 2)
+        {
+          cout << "\nCaution! All edits made to stat points are final.\nChoose wisely.\n";
+          if (playerEdit.statPointsTotal > 0)
+            {
+              //updates the player's stats
+              while (playerEdit.statPointsTotal > 0 && answer != 7)
+                {
+                  cout << "1 to upgrade strength.\n"
+                       << "2 to upgrade dexterity.\n"
+                       << "3 to upgrade constitution.\n"
+                       << "4 to upgrade intelligence.\n"
+                       << "5 to upgrade wisdom.\n"
+                       << "6 to upgrade charisma.\n"
+                       << "7 to exit.\n"
+                       << "Enter answer: ";
+                  cin >> answer;
+
+                  if (answer == 1)
+                    {
+                      cout << "You have selected to upgrade strength.\n"
+                           << "You feel vigor coursing through your veins.\n\n";
+                      playerEdit.setStrength(playerEdit.getStrength() + 1);
+                      playerEdit.statPointsTotal--;
+                    }
+                  else if (answer == 2)
+                    {
+                      cout << "You have selected to upgrade dexterity.\n"
+                           << "You feel your reflexes get faster.\n\n";
+                      playerEdit.setDexterity(playerEdit.getDexterity() + 1);
+                      playerEdit.statPointsTotal--;
+                    }
+                  else if (answer == 3)
+                    {
+                      cout << "You have selected to upgrade constitution.\n"
+                           << "You feel yourself get increasingly tough.\n\n";
+                      playerEdit.setConstitution(playerEdit.getConstitution() + 1);
+                      playerEdit.statPointsTotal--;
+                    }
+                  else if (answer == 4)
+                    {
+                      cout << "You have selected to upgrade intelligence.\n"
+                           << "You feel as if you can read a hundred books.\n\n";
+                      playerEdit.setIntelligence(playerEdit.getIntelligence() + 1);
+                      playerEdit.statPointsTotal--;
+                    }
+                  else if (answer == 5)
+                    {
+                      cout << "You have selected to upgrade wisdom.\n"
+                           << "You feel sage wisdom filling your mind.\n\n";
+                      playerEdit.setWisdom(playerEdit.getWisdom() + 1);
+                      playerEdit.statPointsTotal--;
+                    }
+                  else if (answer == 6)
+                    {
+                      cout << "You have selected to upgrade charisma.\n"
+                           << "Your looks and speechcraft are immediately increased.\n\n";
+                      playerEdit.setCharisma(playerEdit.getCharisma() + 1);
+                      playerEdit.statPointsTotal--;
+                    }
+                  else if (answer == 7)
+                    {
+                      cout << "Exiting...\n\n";
+                      continue;
+                    }
+                  else
+                    {
+                      cout << "Invalid response. Enter a correct response.\n\n";
+                    }
+                  if (playerEdit.statPointsTotal == 1)
+                    cout << "You have " << playerEdit.statPointsTotal << " stat point left.\n";
+                  else
+                    cout << "You have " <<playerEdit.statPointsTotal << " stat points left.\n";
+                }
+              cout << "You have finished updating your skills.\n\n";
+            }
+          else
+            cout << "You have no stat points to upgrade your skills.\n\n";
+        }
+      else if (answer == 3)
+        {
+          //exits the while loop
+          correctAnswer = true;
+        }
+      else
+        correctAnswer = false;
+    }
 }
 
-player::player(int strength, int dex, int intell, int wis, int cha, int con){
-    setMaxHealth(12);
-    initializeHealth();
-    setStrength(strength);
-    setLevel(1);
-    setDefense(1);
-    setDexterity(dex);
-    setWisdom(wis);
-    setCharisma(cha);
-    setConstitution(con);
-    setIntelligence(intell);
+//almost finished, have to figure out why the program exits after executing updateStats()
+void characterCreation()
+{
+  //defines an object player
+  player playerEdit;
+  int answer;
+  bool correctAnswer = false;
+
+  //permits the player to select their class
+  while (!correctAnswer)
+    {
+      cout << "1 for mage.\n2 for fighter.\nEnter answer: ";
+      cin >> answer;
+
+      if (answer == 1)
+        {
+          cout << "You have selected mage.\n";
+          playerEdit.specialty = 1;
+          correctAnswer = true;
+        }
+      else if (answer == 2)
+        {
+          cout << "You have selected fighter.\n";
+          playerEdit.specialty = 2;
+          correctAnswer = true;
+        }
+      else
+        {
+          cout << "Invalid answer, please try again.\n";
+          correctAnswer = false;
+        }
+    }
+
+  //determines stats
+  cout << "\nYou are allowed to increase your base stats.\n";
+  updateStats();
+
+  if (playerEdit.specialty == 2)
+    {
+      cout << "\nAs a fighter you currently have a standard sword.\n"
+           << "It currently has no special properties...\n"
+           << "You also have access to standard heavy armor.\n\n";
+      playerEdit.setHealth(14 + (playerEdit.getConstitution() * 2));
+      playerEdit.setDefense(5 + playerEdit.getConstitution());
+      playerEdit.weapon = "Sword";
+    }
+  else if (playerEdit.specialty == 1)
+    {
+      cout << "\nAs a mage you have a spellbook with firebolt.\n"
+           << "It is currently not a powerful spell...\n"
+           << "You also have access to wizard robes. "
+           << "Though they offer no protection in a fight, "
+           << "they look dashing on you.\n\n";
+      playerEdit.setHealth(8 + (playerEdit.getConstitution() * 2));
+      playerEdit.setDefense(1 + playerEdit.getConstitution());
+    }
+
+  cout << "Now you are almost ready to adventure.\n"
+       << "However, you require a name, adventurer.\n"
+       << "Enter name: ";
+  cin >> playerEdit.name;
+
+  if (playerEdit.specialty == 1)
+    cout << "Well, " << playerEdit.name << " the Mage, it appears now you are ready to adventure.\n";
+  else if (playerEdit.specialty == 2)
+    cout << "Well, " << playerEdit.name << " the Fighter, it appears now you are ready to adventure.\n";
 }
+
+//END OF PLAYER FUNCTIONS
 
 //a wolf enemy class
 class wolf : public creatureType{
@@ -444,7 +680,7 @@ class skeleton: public creatureType{
     public:
     skeleton();
     void weaponAttack(creatureType& opponent);
-    sword sword;
+    sword swordWeapon;
 
 };
 
@@ -572,7 +808,7 @@ redDragonWyrm::redDragonWyrm(){
 class goblin: public creatureType{
     public:
     goblin();
-    scimitar scimitar;
+    scimitar scimitarWeapon;
 };
 
 goblin::goblin(){
@@ -592,7 +828,7 @@ goblin::goblin(){
 class goblinBoss: public goblin{
     public:
     goblinBoss();
-    void multiattack();
+  void multiattack(creatureType& opponent, weaponBase& weaponBase);
 };
 
 goblinBoss::goblinBoss(){
