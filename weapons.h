@@ -2,7 +2,10 @@
 //These have the stats and logic of the weapons. 
 //Each weapon then inherits the weapon type each with there own attack string.
 
-//11/12/23: The creation of this file, quickly defining the weapon class that each on will inheret
+//11/12/23 Joshua: The creation of this file, quickly defining the weapon class that each on will inheret
+//11/14/23 Joshua: The creation of multiple weapon types
+//11/16/23 Joshua: More weapon subclasses created
+//11/23/23 Joshua: The creation of more weapon subclasses like scimitar
 
 #ifndef H_weapons
 #define H_weapons
