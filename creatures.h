@@ -626,6 +626,7 @@ wolf::wolf(){
     setConstitution(1);
 }
 
+//a zombie enemy class
 class zombie: public creatureType{
     public:
         zombie();
@@ -667,6 +668,7 @@ void zombie::slam(creatureType& opponent){
     }
 }
 
+//this kicks in when the zombie is reduced to zero hit points
 void zombie::undeadFortitude(){
     int reviveCheck = diceRoll(1,20);
     reviveCheck += savingRoll(getConstitution());
@@ -676,6 +678,7 @@ void zombie::undeadFortitude(){
     }
 }
 
+//a skeleton enemy class
 class skeleton: public creatureType{
     public:
     skeleton();
@@ -684,24 +687,25 @@ class skeleton: public creatureType{
 
 };
 
-/*void skeleton::weaponAttack(creatureType& opponent){
-    int attackCheck = diceRoll(1,20);
-    attackCheck += getStrength();
-    if(attackCheck >= opponent.getDefense()){
-        int damage = sword.getDamage();
-        damage = -1*(damage+getStrength());
-        cout << sword.getDamageText() << opponent.name << " dealing " << -damage << " damage." << endl;
-        if(damage > opponent.getHealth()){
-            opponent.setHealth(0);
-            cout << "The " << opponent.name << " dies";
-        }else{
-            opponent.changeHealth(damage);
-            cout << "The " << opponent.name << " has " << opponent.getHealth() << " health left." << endl;
-        }
+void skeleton::weaponAttack(creatureType& opponent){
+  sword swordWeapon;
+  int attackCheck = diceRoll(1,20);
+  attackCheck += getStrength();
+  if(attackCheck >= opponent.getDefense()){
+    int damage = swordWeapon.getDamage();
+    damage = -1*(damage+getStrength());
+    cout << swordWeapon.getDamageText() << opponent.name << " dealing " << -damage << " damage." << endl;
+    if(damage > opponent.getHealth()){
+      opponent.setHealth(0);
+      cout << "The " << opponent.name << " dies";
     }else{
-        cout << sword.getMissText();
+      opponent.changeHealth(damage);
+      cout << "The " << opponent.name << " has " << opponent.getHealth() << " health left." << endl;
     }
-}*/
+  }else{
+    cout << swordWeapon.getMissText();
+  }
+}
 
 skeleton::skeleton(){
     name = "skeleton";
@@ -831,6 +835,7 @@ class goblinBoss: public goblin{
   void multiattack(creatureType& opponent, weaponBase& weaponBase);
 };
 
+/*
 goblinBoss::goblinBoss(){
     name = "goblin";
     setMaxHealth(21);
@@ -854,6 +859,7 @@ void goblinBoss::multiattack(creatureType& opponent, weaponBase& weaponBase){
         cout << weaponBase.getMissText;
     }
 }
+*/
 
 
 #endif

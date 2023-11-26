@@ -17,6 +17,13 @@ CHANGELOG
 25 November 2023 00:00 - Mark Ardrey
   Added functions encounters, fight, and randomForestDialogue.
   Defined function randomForestDialogue.
+
+25 November 2023 22:00 - Mark Ardrey
+  Defined function encounters and fighting.
+    - Unfinished.
+
+26 November 2023 1:00 - Mark Ardrey
+  Finished function fighting and encounters.
  ****************************************************************/
 
 #include <iostream>
@@ -47,7 +54,8 @@ void openMenu()
       else
         cout << playerEdit.healthPotions << " healing potions remaining.\n";
       cout << "3 to open inventory.\n"
-           << "4 to exit.\n"
+           << "4 to exit the menu.\n"
+           << "5 to exit the game.\n"
            << "Enter answer: ";
       cin >> answer;
       if (answer == 1)
@@ -86,6 +94,32 @@ void openMenu()
           cout << "Exiting...";
           continue;
         }
+      else if (answer == 5)
+        {
+          answer = 0;
+          while (answer != 1 && answer != 2)
+            {
+              cout << "\nAre you sure you want to exit?"
+                   << "\nAll unsaved progress will be lost."
+                   << "\n1 to exit the game."
+                   << "\n2 to continue playing."
+                   << "\nEnter answer: ";
+              cin >> answer;
+              if (answer == 1)
+                {
+                  cout << "\nExiting...";
+                  continue;
+                }
+              else if (answer == 2)
+                {
+                  cout << "\nContinuing game.";
+                }
+              else
+                {
+                  cout << "\nInvalid answer. Enter correct answer.\n";
+                }
+            }
+        }
       else
         {
           cout << "Invalid answer. Enter a valid answer.\n";
@@ -93,15 +127,51 @@ void openMenu()
     }
 }
 
-void encounters()
+void fight(creatureType& opponent)
 {
   player playerEdit;
+  while (playerEdit.getHealth() > 0 && opponent.getHealth() > 0)
+    {
+      
+    }
 }
 
-void fight()
+void encounters(creatureType& questTarget)
 {
   player playerEdit;
-  while (playerEdit.
+  wolf wolfAttack;
+  zombie zombieAttack;
+  skeleton skeletonAttack;
+  goblin goblinAttack;
+
+  int temp = diceRoll(1, 20); //temp is used to store the dice roll
+
+  if (temp >= 1 && temp < 18)
+    {
+      //if statement intentionally left blank.
+      //nothing happens if the player gets between these values
+    }
+  else if (temp >= 18 && temp < 20)
+    {
+      //the player should encounter a monster between these rolls
+      if (temp == 20)
+        {
+          //the player should encounter their target
+        }
+      else
+        {
+          temp = diceRoll(1, 4);
+          if (temp == 1)
+            fight(skeletonAttack.skeleton);
+          else if (temp == 2)
+            fight(zombieAttack.zombie);
+          else if (temp == 3)
+            fight(wolfAttack.wolf);
+          else if (temp == 4)
+            fight(goblinAttack.goblin);
+        }
+    }
+  
 }
 
 void randomForestDialogue()
